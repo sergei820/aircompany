@@ -3,47 +3,34 @@ package Planes;
 import java.util.Objects;
 
 public class PassengerPlane extends Plane{
+    private int planePassengersCapacity;
 
-    //=================FIELDS=================
-    private int passengersCapacity;
-
-    //=================CONSTRUCTORS=================
-    public PassengerPlane(String model, int maxSpeed, int maxFlightDistance, int maxLoadCapacity, int passengersCapacity) {
-        super(model, maxSpeed, maxFlightDistance, maxLoadCapacity);
-        this.passengersCapacity = passengersCapacity;
+    public PassengerPlane(String modelName, int planeMaxSpeed, int planeMaxFlightDistance, int planeMaxLoadCapacity, int planePassengersCapacity) {
+        super(modelName, planeMaxSpeed, planeMaxFlightDistance, planeMaxLoadCapacity);
+        this.planePassengersCapacity = planePassengersCapacity;
     }
 
-
-    //=================METHODS=================
-    public int getPassengersCapacity() {
-        return passengersCapacity;
+    public int getPlanePassengersCapacity() {
+        return planePassengersCapacity;
     }
 
     @Override
     public String toString() {
         return super.toString().replace("}",
-                ", passengersCapacity=" + passengersCapacity +
+                ", passengersCapacity=" + planePassengersCapacity +
                 '}');
     }
 
-//    @Override
-//    public String toString() {
-//        return super.toString().replace("}",
-//                ", passengersCapacity=" + passengersCapacity +
-//                        '}');
-//    }
-
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PassengerPlane)) return false;
-        if (!super.equals(o)) return false;
-        PassengerPlane plane = (PassengerPlane) o;
-        return passengersCapacity == plane.passengersCapacity;
+    public boolean equals(Object comparedPlane) {
+        if (this == comparedPlane) return true;
+        if (comparedPlane instanceof PassengerPlane) return true;
+        if (super.equals(comparedPlane)) return true;
+        return planePassengersCapacity == ((PassengerPlane) comparedPlane).planePassengersCapacity;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), passengersCapacity);
+        return Objects.hash(super.hashCode(), planePassengersCapacity);
     }
 }

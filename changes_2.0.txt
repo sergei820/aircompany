@@ -1,0 +1,97 @@
+Мне кажется, что planeModel лишнее. Только потому что Plane ну и так абстрактный класс и родитель наследуемых классов, которые тоже будут перенимать эти поля. Может быть planeModel стоит заменить на modelName. Внутри методов я обычно сам очень конкретизирую название переменной со всеми подробностями, а тут ну класс Plane, все его поля так или иначе этот самый plane уже описывают. Но я лично не стану здесь настаивать. Если ты уверен, что для тебя planeModel понятнее и точно спасает от потенциальной путаницы, то оставь.
+
+1. переменная plameModel переименована в modelName
+
+
+Но опять же, следуя этой же логике, почему класс ExperimentalTypes не ExperimentalPlaneTypes? private ExperimentalTypes type звучит как какой-то экспериментационный тип, а не тип экспериментационных самолётов.
+
+2. enum ExperimentalTypes переименован в ExperimentalPlaneTypes
+3. enum MilitaryType переименован в MilitaryPlaneTypes
+
+
+В методе public boolean equals(Object comparedPlane) ты осуществил следующее изменение: 
+if (!(comparedPlane instanceof Plane)) return false;
+vs
+if (comparedPlane instanceof Plane) return true;
+Следим за руками: если в первом случае класс объекта не Plane, то метод всё, останавливается и выдаёт false без дальнейших проверок, то после твоего исправления ничего не происходит и он идёт дальше. Как решить? Можно использовать
+return comparedPlane instanceof Plane;
+Если эта строчка вообще нужна, конечно, потому что до неё стоит строка return this == comparedPlane (и если это верно, то значит точно Plane). Я без понятия, работает ли этот код вообще и зачем в конце Objects.equals(planeModel, ((Plane) comparedPlane).planeModel) (не зациклится ли этот метод в таком случае?).
+ 
+4. реализация метода equals() в классе Plane:
+
+public boolean equals(Object comparedPlane) {
+        if (this == comparedPlane) return true;
+        if (comparedPlane instanceof Plane) return false;
+        Plane plane = (Plane) comparedPlane;
+        return planeMaxSpeed == plane.planeMaxSpeed &&
+                planeMaxFlightDistance == plane.planeMaxFlightDistance &&
+                planeMaxLoadCapacity == plane.planeMaxLoadCapacity &&
+                Objects.equals(modelName, plane.modelName);
+    }
+ 
+
+У MilitaryPlane ещё добавилось if (super.equals(comparedPlane)) return true;, а значит первые две строчки там можно убрать
+
+5. реализация метода equals() в классе MilitaryPlane:
+
+@Override
+    public boolean equals(Object comparedPlane) {
+        if (super.equals(comparedPlane)) return true;
+        MilitaryPlane militaryPlane = (MilitaryPlane) comparedPlane;
+        return planeType == militaryPlane.planeType;
+    }
+
+
+Убран "TODO" комментарий про implement it later, но я не против удалить весь этот нигде не используемый класс вообще. Во славу YAGNI, конечно же («You aren't gonna need it»).
+
+6. Удален не используемый класс MyPlane
+
+
+Комментарий /* Sorts by max speed лучше бы сделать документационным, написав /// Тогда описание метода можно увидеть при его использовании (там и имена переменных, которые применяются в методе). Обожаю документационные комментарии, хотя многие считают, что метод должен быть написан так, чтобы он и вовсе в комментариях не нуждался.
+P.S.: Так, это только в C# такое, а не Java (тут JavaDoc). Извини, тут я перепутал :D
+ под вечер уже
+
+Если нет возражений, я бы оставил без данного комментария, поскольку суть метода отражена в названии sortByMaxSpeed()
+
+
+В методах getPassengerPlanesInAirport() можно было бы использовать foreach.
+
+7. Итерирование в методах getPassengerPlaneWithMaxPassengersCapacity(), getTransportMilitaryPlanes() и getBomberMilitaryPlanes() изменено на foreach:
+было:
+for (int i = 0; i < passengerPlanes.size(); i++) {
+			if (passengerPlane.getPlanePassengersCapacity() > planeWithMaxCapacity.getPlanePassengersCapacity()) {
+				planeWithMaxCapacity = passengerPlane;
+			}
+		}
+стало:
+for(PassengerPlane passengerPlane : passengerPlanes) {
+            if (passengerPlane.getPlanePassengersCapacity() > planeWithMaxCapacity.getPlanePassengersCapacity()) {
+                planeWithMaxCapacity = passengerPlane;
+            }
+        }
+
+
+Вот в getBomberMilitaryPlanes()  переменную MilitaryPlane plane = militaryPlanes.get(i); можно было бы назвать и поконкретнее, типа bomber там.
+
+8. getMilitaryPlanes().get(i) переименована в bomberMilitaryPlane
+
+
+Assert.assertTrue(experimentalPlane.getClassificationLevel() != ClassificationLevel.UNCLASSIFIED);
+Здесь можно использовать и Assert.assertFalse, но не так уж принципиально. Или даже Assert.AreNotEqual. Применять Assert.Equal вместо Assert.assertTrue(militaryPlane.getPlaneType() == MilitaryType.BOMBER);
+
+//Если нет возражений, я бы оставил без изменений.
+
+
+Я не совсем понял, что в блоке "Курс на Learn" и что за скриншоты, но очень интересно. 
+
+//Помимо домашнего задания на портале Learn есть ссылка на курс, состоящий из видео и тестов на тему CleanCode
+
+Вставлю свои пять копеек:
+>На данном скриншоте было бы лучше назвать переменную по имени класса findTicketsPage.
+Тут я не согласен. Просто find это глагол и глаголом мы обычно именуем методы, а переменная типа foundedTicketsPage - уже найденная страница билетов.
+
+//Кстати да
+
+Перед правильным ответом на "Выберите подходящие имена классов" ты добавил с неправильным ответом. Я не знаю, это специально или нет, но мне интересно было почитать там Answer, так что спасибо.
+
+//Это для себя, добавил специально, поскольку допустил ошибку.
